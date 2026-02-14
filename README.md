@@ -7,12 +7,16 @@ A command-line interface for reading and sending Proton Mail emails, built on to
 ```bash
 git clone https://github.com/heikki-laitala/protonmail-cli.git
 cd protonmail-cli
-python3 -m venv .venv
-source .venv/bin/activate
-pip install -e .
+uv sync
 ```
 
-Or use the wrapper script without activating the venv:
+Then run commands with:
+
+```bash
+uv run pmail --help
+```
+
+Or use the wrapper script:
 
 ```bash
 ./pmail.sh --help

@@ -1,3 +1,3 @@
 #!/usr/bin/env bash
-# Convenience wrapper — runs pmail from the venv
-exec "$(dirname "$0")/.venv/bin/pmail" "$@"
+# Convenience wrapper — runs pmail via uv
+exec uv run --project "$(dirname "$0")" pmail "$@"
