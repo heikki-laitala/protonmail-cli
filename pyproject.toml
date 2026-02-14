@@ -1,0 +1,21 @@
+[build-system]
+requires = ["setuptools>=68.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "protonmail-cli"
+version = "0.1.0"
+description = "CLI tool for reading and sending Proton Mail emails"
+requires-python = ">=3.9"
+dependencies = [
+    "protonmail-api-client>=2.4.0",
+    "click>=8.0",
+    "rich>=13.0",
+    "keyring>=24.0",
+]
+
+[project.scripts]
+pmail = "protonmail_cli.cli:cli"
+
+[tool.setuptools.packages.find]
+where = ["src"]
