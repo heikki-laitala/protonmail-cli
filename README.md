@@ -94,6 +94,7 @@ pmail logout   # remove saved session
 
 ## Notes
 
+- Message indices (used by `read`, `reply`, `forward`, `delete`, `archive`, etc.) resolve against the **inbox only**. Do not use indices from non-inbox listings (`sent`, `spam`, etc.) — they will operate on the wrong message.
 - Proton Mail does not offer a public API. This tool uses the community [protonmail-api-client](https://github.com/opulentfox-29/protonmail-api-client) library which may break if Proton changes their internal APIs.
 - Session files contain sensitive authentication data — do not share them.
 - CAPTCHA may be triggered on login. The library attempts automatic solving; if that fails, you'll be prompted for manual token entry.
