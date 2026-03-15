@@ -46,5 +46,6 @@ Run it via the wrapper script in this repository: `./pmail.sh` (or add it to you
 - `pmail logout` — Remove session
 
 ## Notes
-- Message indices come from `pmail ls` output (0-based)
-- Confirm with the user before sending, replying, forwarding, or deleting
+- Message indices are 0-based and **resolve against the inbox only**. Actions like `read`, `reply`, `forward`, `delete`, `archive`, etc. always operate on inbox messages. Do not use indices from non-inbox listings (sent, spam, drafts, etc.) — they will reference the wrong message.
+- Always run `pmail ls` (inbox) before using an index for any action.
+- Confirm with the user before sending, replying, forwarding, or deleting.
