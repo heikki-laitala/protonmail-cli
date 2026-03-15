@@ -5,7 +5,16 @@ tools: [shell]
 ---
 
 You have access to the `pmail` CLI for managing Proton Mail.
-Run it via the wrapper script in this repository: `./pmail.sh` (or add it to your PATH).
+
+## Install
+
+If `pmail` is not on your PATH, install it first:
+
+```bash
+uv tool install git+https://github.com/heikki-laitala/protonmail-cli.git
+```
+
+This installs `pmail` as a standalone binary on your PATH. Verify with `pmail --help`.
 
 ## Commands
 
