@@ -30,6 +30,24 @@ uv run pmail --help  # Run CLI
 - **Session**: Pickle-based, auto-refreshing. Login only needed once.
 - **Git**: Conventional commits (`feat:`, `fix:`, `chore:`, `docs:`). No Co-Authored-By trailer. No "Generated with Claude Code" footer in PR descriptions.
 
+## Engineering Principles
+
+### KISS
+
+Prefer straightforward control flow. Keep error paths obvious and localized.
+
+### YAGNI
+
+Do not add interfaces, config keys, or abstractions without a concrete caller. No speculative features.
+
+### DRY (Rule of Three)
+
+Duplicate small local logic when it preserves clarity. Extract shared helpers only after three repeated, stable patterns.
+
+### Secure by Default
+
+Never log secrets or tokens. Validate at system boundaries. Keep network/filesystem/shell scope narrow.
+
 ## Key Constraint
 
 Message indices (used by `read`, `reply`, `forward`, `delete`, `archive`, etc.) resolve against the **inbox only**. Indices from non-inbox listings (`sent`, `spam`, etc.) will operate on the wrong message.
