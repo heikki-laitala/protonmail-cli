@@ -5,9 +5,15 @@ CLI for reading and sending Proton Mail emails, built on [protonmail-api-client]
 ## Build & Run
 
 ```bash
-uv sync              # Install dependencies
+uv sync --group dev  # Install dependencies (including dev tools)
 uv run pmail --help  # Run CLI
 ./pmail.sh --help    # Wrapper script (calls uv run)
+```
+
+Validation before commit:
+
+```bash
+uv run ruff check . && uv run ruff format --check . && uv run pytest tests/ -v
 ```
 
 ## Project Structure

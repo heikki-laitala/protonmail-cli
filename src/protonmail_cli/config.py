@@ -16,9 +16,7 @@ def get_client():
     from protonmail import ProtonMail
 
     if not SESSION_FILE.exists():
-        raise SystemExit(
-            "Not logged in. Run: pmail login"
-        )
+        raise SystemExit("Not logged in. Run: pmail login")
 
     proton = ProtonMail(logging_level=4)  # ERROR only
     proton.load_session(str(SESSION_FILE), auto_save=True)

@@ -88,15 +88,21 @@ def print_message_list(messages, folder_name="Inbox"):
 
 def print_message(message):
     """Print a single message in detail."""
-    sender = f"{message.sender.name} <{message.sender.address}>" if message.sender.name else message.sender.address
-    to_list = ", ".join(
-        f"{r.name} <{r.address}>" if r.name else r.address
-        for r in message.recipients
+    sender = (
+        f"{message.sender.name} <{message.sender.address}>"
+        if message.sender.name
+        else message.sender.address
     )
-    cc_list = ", ".join(
-        f"{r.name} <{r.address}>" if r.name else r.address
-        for r in message.cc
-    ) if message.cc else None
+    to_list = ", ".join(
+        f"{r.name} <{r.address}>" if r.name else r.address for r in message.recipients
+    )
+    cc_list = (
+        ", ".join(
+            f"{r.name} <{r.address}>" if r.name else r.address for r in message.cc
+        )
+        if message.cc
+        else None
+    )
 
     header_lines = [
         f"[bold]From:[/]    {sender}",

@@ -17,7 +17,6 @@ from protonmail_cli.formatting import (
     format_timestamp,
     print_message,
     print_message_list,
-    strip_html,
 )
 
 
@@ -30,6 +29,7 @@ def cli():
 # ---------------------------------------------------------------------------
 # Auth
 # ---------------------------------------------------------------------------
+
 
 @cli.command()
 @click.option("--username", "-u", prompt="Username", help="Proton Mail username/email")
@@ -109,7 +109,9 @@ def ls(folder, limit, page):
         return
 
     print_message_list(messages, folder_name)
-    console.print(f"\n[dim]Use [bold]pmail read <#>[/bold] with the # from this list.[/]")
+    console.print(
+        "\n[dim]Use [bold]pmail read <#>[/bold] with the # from this list.[/]"
+    )
 
 
 @cli.command()
@@ -127,7 +129,9 @@ def read(message_ref, show_html, no_mark_read):
         with console.status("Fetching inbox..."):
             messages = _get_messages_by_label(proton, "0", page_size=idx + 1)
         if idx >= len(messages):
-            raise SystemExit(f"Index {idx} out of range (have {len(messages)} messages)")
+            raise SystemExit(
+                f"Index {idx} out of range (have {len(messages)} messages)"
+            )
         msg_id = messages[idx].id
 
     with console.status("Reading message..."):
@@ -158,14 +162,25 @@ def thread(conversation_ref):
 # Sending emails
 # ---------------------------------------------------------------------------
 
+
 @cli.command()
-@click.option("--to", "-t", "recipients", required=True, multiple=True, help="Recipient email(s)")
+@click.option(
+    "--to", "-t", "recipients", required=True, multiple=True, help="Recipient email(s)"
+)
 @click.option("--cc", multiple=True, help="CC recipient(s)")
 @click.option("--bcc", multiple=True, help="BCC recipient(s)")
 @click.option("--subject", "-s", required=True, help="Subject line")
-@click.option("--body", "-b", help="Message body (plain text). Omit to read from stdin.")
+@click.option(
+    "--body", "-b", help="Message body (plain text). Omit to read from stdin."
+)
 @click.option("--html", "is_html", is_flag=True, help="Treat body as HTML")
-@click.option("--attach", "-a", multiple=True, type=click.Path(exists=True), help="File attachment(s)")
+@click.option(
+    "--attach",
+    "-a",
+    multiple=True,
+    type=click.Path(exists=True),
+    help="File attachment(s)",
+)
 def send(recipients, cc, bcc, subject, body, is_html, attach):
     """Send an email."""
     proton = get_client()
@@ -178,6 +193,7 @@ def send(recipients, cc, bcc, subject, body, is_html, attach):
     attachments = []
     for filepath in attach:
         from pathlib import Path
+
         p = Path(filepath)
         content = p.read_bytes()
         att = proton.create_attachment(content=content, name=p.name)
@@ -251,21 +267,27 @@ def reply(message_ref, body, reply_all):
     reply_msg = proton.create_message(
         recipients=recipients,
         cc=cc,
-        subject=f"Re: {original.subject}" if not original.subject.startswith("Re:") else original.subject,
+        subject=f"Re: {original.subject}"
+        if not original.subject.startswith("Re:")
+        else original.subject,
         body=html_body,
         in_reply_to=original.external_id,
     )
 
     with console.status("Sending reply..."):
-        sent = proton.send_message(reply_msg, is_html=True)
+        proton.send_message(reply_msg, is_html=True)
 
     console.print(f"[green]Reply sent![/] To: {', '.join(recipients)}")
 
 
 @cli.command()
 @click.argument("message_ref")
-@click.option("--body", "-b", help="Forward body (plain text). Omit to read from stdin.")
-@click.option("--to", "-t", "recipients", required=True, multiple=True, help="Forward to email(s)")
+@click.option(
+    "--body", "-b", help="Forward body (plain text). Omit to read from stdin."
+)
+@click.option(
+    "--to", "-t", "recipients", required=True, multiple=True, help="Forward to email(s)"
+)
 def forward(message_ref, body, recipients):
     """Forward a message."""
     proton = get_client()
@@ -290,7 +312,9 @@ def forward(message_ref, body, recipients):
         console.print("[dim]Add a note (Ctrl+D to finish, or just Ctrl+D for none):[/]")
         raw = sys.stdin.read()
         if raw.strip():
-            escaped = raw.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;")
+            escaped = (
+                raw.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;")
+            )
             note = f"<pre>{escaped}</pre><hr>"
 
     fwd_body = f"""{note}
@@ -307,7 +331,7 @@ Subject: {original.subject}</p>
     )
 
     with console.status("Forwarding..."):
-        sent = proton.send_message(fwd_msg, is_html=True)
+        proton.send_message(fwd_msg, is_html=True)
 
     console.print(f"[green]Forwarded![/] To: {', '.join(recipients)}")
 
@@ -315,6 +339,7 @@ Subject: {original.subject}</p>
 # ---------------------------------------------------------------------------
 # Managing emails
 # ---------------------------------------------------------------------------
+
 
 @cli.command()
 @click.argument("message_refs", nargs=-1, required=True)
@@ -388,6 +413,7 @@ def unread(message_refs):
 # Folders & labels
 # ---------------------------------------------------------------------------
 
+
 @cli.command()
 def folders():
     """List all folders and labels."""
@@ -401,13 +427,13 @@ def folders():
         if label.type == 4:
             console.print(f"  {label.name:<20} [dim](id: {label.id})[/]")
 
-    user_labels = [l for l in all_labels if l.type == 1]
+    user_labels = [label for label in all_labels if label.type == 1]
     if user_labels:
         console.print("\n[bold]Labels:[/]")
         for label in user_labels:
             console.print(f"  {label.name:<20} [dim](id: {label.id})[/]")
 
-    user_folders = [l for l in all_labels if l.type == 3]
+    user_folders = [label for label in all_labels if label.type == 3]
     if user_folders:
         console.print("\n[bold]Custom folders:[/]")
         for label in user_folders:
@@ -423,6 +449,7 @@ def count():
         counts = proton.get_messages_count()
 
     from rich.table import Table
+
     table = Table(title="Message counts")
     table.add_column("Folder", style="cyan")
     table.add_column("Total", justify="right")
@@ -445,12 +472,14 @@ def count():
 # Attachments
 # ---------------------------------------------------------------------------
 
+
 @cli.command()
 @click.argument("message_ref")
 @click.option("--output", "-o", type=click.Path(), default=".", help="Output directory")
 def download(message_ref, output):
     """Download attachments from a message."""
     from pathlib import Path
+
     proton = get_client()
 
     msg_id = message_ref
@@ -488,6 +517,7 @@ def download(message_ref, output):
 # Watch for new messages
 # ---------------------------------------------------------------------------
 
+
 @cli.command()
 @click.option("--timeout", "-t", default=0, help="Timeout in seconds (0 = forever)")
 @click.option("--interval", "-i", default=10, help="Poll interval in seconds")
@@ -495,7 +525,9 @@ def watch(timeout, interval):
     """Watch for new messages (live)."""
     proton = get_client()
 
-    console.print(f"[dim]Watching for new messages (poll every {interval}s)... Press Ctrl+C to stop.[/]")
+    console.print(
+        f"[dim]Watching for new messages (poll every {interval}s)... Press Ctrl+C to stop.[/]"
+    )
 
     def on_event(response):
         new_msgs = response.get("Messages", [])
@@ -522,6 +554,7 @@ def watch(timeout, interval):
 # Helpers
 # ---------------------------------------------------------------------------
 
+
 def _get_messages_by_label(proton, label_id, page=0, page_size=150):
     """Fetch a single page of messages filtered by label.
 
@@ -545,7 +578,9 @@ def _resolve_refs(proton, refs):
             if inbox_cache is None:
                 max_idx = max(int(r) for r in refs if r.isdigit() and len(r) <= 4)
                 with console.status("Fetching inbox..."):
-                    inbox_cache = _get_messages_by_label(proton, "0", page_size=max_idx + 1)
+                    inbox_cache = _get_messages_by_label(
+                        proton, "0", page_size=max_idx + 1
+                    )
             if idx >= len(inbox_cache):
                 raise SystemExit(f"Index {idx} out of range")
             ids.append(inbox_cache[idx].id)
