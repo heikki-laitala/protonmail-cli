@@ -21,7 +21,7 @@ from protonmail_cli.formatting import (
 
 
 @click.group()
-@click.version_option(version="0.1.0")
+@click.version_option(package_name="protonmail-cli")
 def cli():
     """pmail — Proton Mail from the command line."""
 

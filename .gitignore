@@ -7,3 +7,4 @@ build/
 .venv/
 *.pickle
 .env
+src/protonmail_cli/_version.py

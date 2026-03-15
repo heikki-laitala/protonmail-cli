@@ -1,6 +1,6 @@
 [project]
 name = "protonmail-cli"
-version = "0.1.0"
+dynamic = ["version"]
 description = "CLI tool for reading and sending Proton Mail emails"
 requires-python = ">=3.9"
 dependencies = [
@@ -23,8 +23,17 @@ dev = [
 Repository = "https://github.com/heikki-laitala/protonmail-cli"
 
 [build-system]
-requires = ["hatchling"]
+requires = ["hatchling", "hatch-vcs"]
 build-backend = "hatchling.build"
+
+[tool.hatch.version]
+source = "vcs"
+
+[tool.hatch.build.hooks.vcs]
+version-file = "src/protonmail_cli/_version.py"
 
 [tool.hatch.build.targets.wheel]
 packages = ["src/protonmail_cli"]
+
+[tool.ruff]
+exclude = ["src/protonmail_cli/_version.py"]
