@@ -102,11 +102,7 @@ def ls(folder, limit, page):
     folder_name = SYSTEM_LABELS.get(label_id, folder)
 
     with console.status(f"Fetching {folder_name}..."):
-        messages = proton.get_messages_by_page(page=page, page_size=limit)
-        # Filter by label if not "all"
-        if label_id != "5":
-            messages = [m for m in proton.get_messages(page_size=limit, label_or_id=label_id)]
-            messages = messages[:limit]
+        messages = _get_messages_by_label(proton, label_id, page=page, page_size=limit)
 
     if not messages:
         console.print(f"[dim]No messages in {folder_name}.[/]")
@@ -129,7 +125,7 @@ def read(message_ref, show_html, no_mark_read):
     if message_ref.isdigit() and len(message_ref) <= 4:
         idx = int(message_ref)
         with console.status("Fetching inbox..."):
-            messages = proton.get_messages(page_size=idx + 1, label_or_id="0")
+            messages = _get_messages_by_label(proton, "0", page_size=idx + 1)
         if idx >= len(messages):
             raise SystemExit(f"Index {idx} out of range (have {len(messages)} messages)")
         msg_id = messages[idx].id
@@ -222,7 +218,7 @@ def reply(message_ref, body, reply_all):
     if message_ref.isdigit() and len(message_ref) <= 4:
         idx = int(message_ref)
         with console.status("Fetching inbox..."):
-            messages = proton.get_messages(page_size=idx + 1, label_or_id="0")
+            messages = _get_messages_by_label(proton, "0", page_size=idx + 1)
         if idx >= len(messages):
             raise SystemExit(f"Index {idx} out of range")
         msg_id = messages[idx].id
@@ -278,7 +274,7 @@ def forward(message_ref, body, recipients):
     if message_ref.isdigit() and len(message_ref) <= 4:
         idx = int(message_ref)
         with console.status("Fetching inbox..."):
-            messages = proton.get_messages(page_size=idx + 1, label_or_id="0")
+            messages = _get_messages_by_label(proton, "0", page_size=idx + 1)
         if idx >= len(messages):
             raise SystemExit(f"Index {idx} out of range")
         msg_id = messages[idx].id
@@ -461,7 +457,7 @@ def download(message_ref, output):
     if message_ref.isdigit() and len(message_ref) <= 4:
         idx = int(message_ref)
         with console.status("Fetching inbox..."):
-            messages = proton.get_messages(page_size=idx + 1, label_or_id="0")
+            messages = _get_messages_by_label(proton, "0", page_size=idx + 1)
         if idx >= len(messages):
             raise SystemExit(f"Index {idx} out of range")
         msg_id = messages[idx].id
@@ -526,6 +522,19 @@ def watch(timeout, interval):
 # Helpers
 # ---------------------------------------------------------------------------
 
+def _get_messages_by_label(proton, label_id, page=0, page_size=150):
+    """Fetch a single page of messages filtered by label.
+
+    Avoids protonmail-api-client's get_messages() which has a pagination bug:
+    it calculates page count from All Mail total regardless of the requested
+    label, firing excessive API requests.
+    """
+    args_list = [(page, page_size, label_id)]
+    messages_lists = proton._async_helper(proton._async_get_messages, args_list)
+    messages_dict = proton._flattening_lists(messages_lists)
+    return [proton._convert_dict_to_message(m) for m in messages_dict]
+
+
 def _resolve_refs(proton, refs):
     """Resolve message references (index numbers or IDs) to message IDs."""
     ids = []
@@ -536,7 +545,7 @@ def _resolve_refs(proton, refs):
             if inbox_cache is None:
                 max_idx = max(int(r) for r in refs if r.isdigit() and len(r) <= 4)
                 with console.status("Fetching inbox..."):
-                    inbox_cache = proton.get_messages(page_size=max_idx + 1, label_or_id="0")
+                    inbox_cache = _get_messages_by_label(proton, "0", page_size=max_idx + 1)
             if idx >= len(inbox_cache):
                 raise SystemExit(f"Index {idx} out of range")
             ids.append(inbox_cache[idx].id)
