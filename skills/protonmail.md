@@ -4,7 +4,8 @@ description: Manage Proton Mail from the terminal using pmail CLI
 tools: [shell]
 ---
 
-You have access to the `pmail` CLI for managing Proton Mail. The binary is at `~/dev/protonmail-cli/pmail.sh`.
+You have access to the `pmail` CLI for managing Proton Mail.
+Run it via the wrapper script in this repository: `./pmail.sh` (or add it to your PATH).
 
 ## Commands
 
@@ -45,6 +46,5 @@ You have access to the `pmail` CLI for managing Proton Mail. The binary is at `~
 - `pmail logout` — Remove session
 
 ## Notes
-- Always use `~/dev/protonmail-cli/pmail.sh` as the command prefix
 - Message indices come from `pmail ls` output (0-based)
 - Confirm with the user before sending, replying, forwarding, or deleting
